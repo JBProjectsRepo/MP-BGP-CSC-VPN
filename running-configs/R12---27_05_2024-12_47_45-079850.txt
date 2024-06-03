@@ -1,0 +1,167 @@
+Building configuration...
+
+Current configuration : 2357 bytes
+!
+! Last configuration change at 18:47:50 EET Mon May 27 2024
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+!
+no aaa new-model
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+ip vrf vpn_c1
+ rd 65012:100
+ export map Client1_to_Client2
+ route-target export 65012:100
+ route-target import 65011:100
+ route-target import 65221:200
+!
+ip vrf vpn_c2
+ rd 65222:100
+ route-target export 65222:100
+ route-target import 65221:100
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 12.12.12.12 255.255.255.0
+ ip ospf network point-to-point
+!
+interface Ethernet0/0
+ ip address 172.21.11.12 255.255.255.0
+ mpls ip
+!
+interface Ethernet0/1
+ ip vrf forwarding vpn_c1
+ ip address 100.1.2.12 255.255.255.0
+!
+interface Ethernet0/2
+ ip vrf forwarding vpn_c2
+ ip address 100.2.1.12 255.255.255.0
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+router ospf 1
+ network 12.12.12.0 0.0.0.255 area 0
+ network 172.21.11.0 0.0.0.255 area 0
+!
+router bgp 65022
+ bgp log-neighbor-changes
+ neighbor 2.2.2.2 remote-as 65021
+ neighbor 2.2.2.2 ebgp-multihop 255
+ neighbor 2.2.2.2 update-source Loopback0
+ !
+ address-family ipv4
+  neighbor 2.2.2.2 activate
+  neighbor 2.2.2.2 send-community extended
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 2.2.2.2 activate
+  neighbor 2.2.2.2 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_c1
+  neighbor 100.1.2.13 remote-as 65012
+  neighbor 100.1.2.13 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_c2
+  neighbor 100.2.1.17 remote-as 65222
+  neighbor 100.2.1.17 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list pfx_c1_to_c2 seq 5 permit 192.168.11.0/24
+!
+route-map Client1_to_Client2 permit 10
+ match ip address prefix-list pfx_c1_to_c2
+ set extcommunity rt 65012:200 additive
+!
+!
+mpls ldp router-id Ethernet0/0
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ exec-timeout 0 0
+ login
+ transport input none
+!
+!
+end

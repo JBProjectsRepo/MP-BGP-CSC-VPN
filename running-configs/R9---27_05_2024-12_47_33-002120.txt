@@ -1,0 +1,180 @@
+Building configuration...
+
+Current configuration : 2439 bytes
+!
+! Last configuration change at 18:47:38 EET Mon May 27 2024
+!
+version 15.4
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R9
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+!
+no aaa new-model
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+ip vrf vpn_c3
+ rd 65032:100
+ route-target export 65032:100
+ route-target import 65031:100
+!
+ip vrf vpn_sp2
+ rd 65022:100
+ route-target export 65022:100
+ route-target import 65021:100
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 9.9.9.9 255.255.255.0
+ ip ospf network point-to-point
+!
+interface Ethernet0/0
+ ip address 172.29.7.9 255.255.255.0
+ mpls ip
+!
+interface Ethernet0/1
+ ip address 172.29.8.9 255.255.255.0
+ mpls ip
+!
+interface Ethernet0/2
+ ip vrf forwarding vpn_sp2
+ ip address 189.100.9.9 255.255.255.0
+ mpls bgp forwarding
+!
+interface Ethernet0/3
+ ip vrf forwarding vpn_c3
+ ip address 100.3.1.9 255.255.255.0
+!
+interface Ethernet1/0
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 9.9.9.9
+ network 9.9.9.0 0.0.0.255 area 0
+ network 172.29.7.0 0.0.0.255 area 0
+ network 172.29.8.0 0.0.0.255 area 0
+!
+router bgp 65000
+ bgp router-id 9.9.9.9
+ bgp log-neighbor-changes
+ neighbor 5.5.5.5 remote-as 65000
+ neighbor 5.5.5.5 update-source Loopback0
+ !
+ address-family ipv4
+  neighbor 5.5.5.5 activate
+  neighbor 5.5.5.5 send-community extended
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 5.5.5.5 activate
+  neighbor 5.5.5.5 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_c3
+  neighbor 100.3.1.14 remote-as 65032
+  neighbor 100.3.1.14 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_sp2
+  neighbor 189.100.9.10 remote-as 65022
+  neighbor 189.100.9.10 activate
+  neighbor 189.100.9.10 send-label
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+mpls ldp router-id Ethernet0/0
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ exec-timeout 0 0
+ login
+ transport input none
+!
+!
+end

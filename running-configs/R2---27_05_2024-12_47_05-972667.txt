@@ -1,0 +1,166 @@
+Building configuration...
+
+Current configuration : 2360 bytes
+!
+! Last configuration change at 18:47:11 EET Mon May 27 2024
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+!
+no aaa new-model
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+ip vrf vpn_c1
+ rd 65011:100
+ route-target export 65011:100
+ route-target import 65012:100
+!
+ip vrf vpn_c2
+ rd 65221:100
+ export map Client2_to_Client1
+ route-target export 65221:100
+ route-target import 65222:100
+ route-target import 65012:200
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.0
+ ip ospf network point-to-point
+!
+interface Ethernet0/0
+ ip vrf forwarding vpn_c1
+ ip address 100.1.0.2 255.255.255.0
+!
+interface Ethernet0/1
+ ip address 172.21.2.2 255.255.255.0
+ mpls ip
+!
+interface Ethernet0/2
+ ip address dhcp
+!
+interface Ethernet0/3
+ ip vrf forwarding vpn_c2
+ ip address 100.2.0.2 255.255.255.0
+!
+router ospf 1
+ network 2.2.2.0 0.0.0.255 area 0
+ network 172.21.2.0 0.0.0.255 area 0
+!
+router bgp 65021
+ bgp log-neighbor-changes
+ neighbor 12.12.12.12 remote-as 65022
+ neighbor 12.12.12.12 ebgp-multihop 255
+ neighbor 12.12.12.12 update-source Loopback0
+ !
+ address-family ipv4
+  neighbor 12.12.12.12 activate
+  neighbor 12.12.12.12 send-community extended
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 12.12.12.12 activate
+  neighbor 12.12.12.12 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_c1
+  neighbor 100.1.0.1 remote-as 65011
+  neighbor 100.1.0.1 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf vpn_c2
+  neighbor 100.2.0.16 remote-as 65221
+  neighbor 100.2.0.16 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list pfx_c2_to_c1 seq 5 permit 21.21.21.0/24
+!
+route-map Client2_to_Client1 permit 10
+ match ip address prefix-list pfx_c2_to_c1
+ set extcommunity rt 65221:200 additive
+!
+!
+mpls ldp router-id Ethernet0/1
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ exec-timeout 0 0
+ login
+ transport input none
+!
+!
+end
