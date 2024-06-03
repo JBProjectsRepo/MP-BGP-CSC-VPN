@@ -17,7 +17,7 @@ The idea is to have a network where **Client-1** and **Client-2** have two sites
 - **Client-1** in **R1** can receive only Client-1 routes
 - **Client-1** in **R13** can receive Client-1 and 21.21.21.0/24 (Client-2) routes
 - **Client-2** in **R17** can receive only Client-2 routes
-- ** Client-2** in **R16** can receive Client-2 and 192.168.11.0/24 (Client-1) routes
+- **Client-2** in **R16** can receive Client-2 and 192.168.11.0/24 (Client-1) routes
 - **Client-3** can receive only Client-3 routes
 - **MAIN-SP** **R6**, **R7** and **R8** can receive only internal routes (ospf) from MAIN-SP
 - **MAIN-SP** **R5** and **R9** can receive routes from Secondary-SP via VRF, from Client-3 via VRF and internal routes from MAIN-SP (ospf)
