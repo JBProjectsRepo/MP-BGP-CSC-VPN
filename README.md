@@ -10,7 +10,7 @@ The idea is to have a network where **Client-1** and **Client-2** have two sites
 
 ### TOPOLOGY ###
 
-![](https://pandao.github.io/editor.md/images/logos/editormd-logo-180x180.png)
+![](https://github.com/JBProjectsRepo/MP-BGP-CSC-VPN/blob/main/images/Topology.png)
 
 ### EXPECTED ###
 
