@@ -6,7 +6,7 @@ All the networking is done under EVE-NG Community Edition.
 
 ### GOAL ###
 
-The idea is to have a network where **Client-1** and **Client-2** have two sites each, that communicate over a VPN which passes through two Service Providers, **Main SP** and **Secondary SP**. Also,** Client-1 network 192.168.11.0** should be able to communicate with **Client-2 network 21.21.21.0**. Finally, **Client-3** VPN passes only through **Main SP** and can communicate only with **Client-3** sites.
+The idea is to have a network where **Client-1** and **Client-2** have two sites each, that communicate over a VPN which passes through two Service Providers, **Main SP** and **Secondary SP**. Also,**Client-1 network 192.168.11.0** should be able to communicate with **Client-2 network 21.21.21.0**. Finally, **Client-3** VPN passes only through **Main SP** and can communicate only with **Client-3** sites.
 
 ### TOPOLOGY ###
 
